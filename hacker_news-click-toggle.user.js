@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HN Click-To-Toggle Comments
 // @namespace    https://github.com/jlmcgraw
-// @version      1.0.0
+// @version      1.0.1
 // @description  Click anywhere on a Hacker News comment to collapse/expand it (forwards click to the built-in [-]/[+] control).
 // @author       Jesse McGraw
 // @match        https://news.ycombinator.com/item?id=*
@@ -9,7 +9,8 @@
 // @match        https://news.ycombinator.com/from*
 // @run-at       document-idle
 // @grant        none
-// @downloadURL  https://raw.githubusercontent.com/jlmcgraw/hacker_news_tampermonkey/main/hn-click-toggle.user.js
+// @downloadURL  https://raw.githubusercontent.com/jlmcgraw/hacker_news_tampermonkey/main/hacker_news-click-toggle.user.js
+// @updateURL    https://raw.githubusercontent.com/jlmcgraw/hacker_news_tampermonkey/main/hacker_news-click-toggle.user.js
 // @homepageURL  https://github.com/jlmcgraw/hacker_news_tampermonkey/
 // @supportURL   https://github.com/jlmcgraw/hacker_news_tampermonkey/issues
 // ==/UserScript==
