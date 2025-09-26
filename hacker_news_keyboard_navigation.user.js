@@ -7,8 +7,8 @@
 // @match        https://news.ycombinator.com/item*
 // @run-at       document-end
 // @grant        none
-// @downloadURL  https://raw.githubusercontent.com/jlmcgraw/hacker_news_tampermonkey/main/hacker_news_keyboard_navigation.js
-// @updateURL    https://raw.githubusercontent.com/jlmcgraw/hacker_news_tampermonkey/main/hacker_news_keyboard_navigation.js
+// @downloadURL  https://raw.githubusercontent.com/jlmcgraw/hacker_news_tampermonkey/main/hacker_news_keyboard_navigation.user.js
+// @updateURL    https://raw.githubusercontent.com/jlmcgraw/hacker_news_tampermonkey/main/hacker_news_keyboard_navigation.user.js
 // @homepageURL  https://github.com/jlmcgraw/hacker_news_tampermonkey/
 // @supportURL   https://github.com/jlmcgraw/hacker_news_tampermonkey/issues
 // ==/UserScript==
