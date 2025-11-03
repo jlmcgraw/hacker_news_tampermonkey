@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HN Keyboard Comments (tree nav + fold/expand)
 // @namespace    https://github.com/jlmcgraw
-// @version      1.1.1
+// @version      1.1.2
 // @description  Keyboard navigation for Hacker News comments: arrows, Enter, Space, Home/End, PageUp/PageDown, and recursive expand/collapse.
 // @author       Jesse McGraw
 // @match        https://news.ycombinator.com/item*
@@ -100,6 +100,16 @@
     const n = nodes[idx];
     return n && n.el.style.display !== 'none';
     // (recomputeVisibility keeps display up to date)
+  }
+
+  function isFoldedIdx(idx) {
+    const row = nodes[idx]?.el;
+    if (!row) return false;
+    if (row.classList.contains('collapsed')) return true;
+    const togg = row.querySelector('.togg');
+    if (!togg) return false;
+    const text = togg.textContent?.trim();
+    return typeof text === 'string' && text.startsWith('[+]');
   }
 
   function nextVisibleIdx(idx, dir) {
@@ -246,7 +256,8 @@
 
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      const next = nextVisibleIdx(activeIdx, +1);
+      let next = nextVisibleIdx(activeIdx, +1);
+      while (next >= 0 && isFoldedIdx(next)) next = nextVisibleIdx(next, +1);
       if (next >= 0) setActive(next);
       return;
     }
