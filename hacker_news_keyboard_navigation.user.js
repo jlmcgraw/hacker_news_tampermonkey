@@ -58,6 +58,21 @@
 
   const collapsed = new Set();
 
+  function getToggle(idx) {
+    return nodes[idx]?.el?.querySelector('.togg');
+  }
+
+  function setNativeCollapsed(idx, shouldCollapse) {
+    const togg = getToggle(idx);
+    if (!togg) return;
+    const text = togg.textContent?.trim();
+    const currentlyCollapsed = typeof text === 'string' && text.startsWith('[+]');
+    if (Boolean(shouldCollapse) === currentlyCollapsed) return;
+    togg.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true, view: window })
+    );
+  }
+
   function recomputeVisibility() {
     const stack = [];
     nodes.forEach((n) => {
@@ -142,20 +157,20 @@
     recomputeVisibility();
   }
 
-  function collapseIdx(idx) {
+  function collapseIdx(idx, { includeComment = false } = {}) {
     collapsed.add(idx);
+    if (includeComment) setNativeCollapsed(idx, true);
     recomputeVisibility();
   }
 
   function expandIdx(idx) {
-    if (collapsed.has(idx)) {
-      collapsed.delete(idx);
-      recomputeVisibility();
-    }
+    if (collapsed.has(idx)) collapsed.delete(idx);
+    setNativeCollapsed(idx, false);
+    recomputeVisibility();
   }
 
   function isCollapsed(idx) {
-    return collapsed.has(idx);
+    return collapsed.has(idx) || isFoldedIdx(idx);
   }
 
   function subtreeEndExclusive(idx) {
@@ -166,15 +181,21 @@
   }
 
   function collapseSubtree(idx) {
+    const base = nodes[idx];
+    if (!base) return;
     const end = subtreeEndExclusive(idx);
     // Mark every descendant as collapsed so later expands reveal as collapsed nodes stay closed
     for (let i = idx; i < end; i++) collapsed.add(i);
+    if (base.indent === 0) setNativeCollapsed(idx, true);
     recomputeVisibility();
   }
 
   function expandSubtree(idx) {
+    const base = nodes[idx];
+    if (!base) return;
     const end = subtreeEndExclusive(idx);
     for (let i = idx; i < end; i++) collapsed.delete(i);
+    if (base?.indent === 0) setNativeCollapsed(idx, false);
     recomputeVisibility();
   }
 
@@ -265,7 +286,10 @@
     if (e.key === 'ArrowLeft') {
       e.preventDefault();
       const me = activeIdx;
-      if (hasChild(me) && !isCollapsed(me)) collapseIdx(me);
+      const node = nodes[me];
+      if (node?.indent === 0 && !isCollapsed(me)) {
+        collapseIdx(me, { includeComment: true });
+      } else if (hasChild(me) && !isCollapsed(me)) collapseIdx(me);
       else {
         const parent = findParentIdx(me);
         if (parent >= 0) setActive(parent);
