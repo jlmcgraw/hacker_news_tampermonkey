@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HN Keyboard Comments (tree nav + fold/expand)
 // @namespace    https://github.com/jlmcgraw
-// @version      1.1.3
+// @version      1.1.4
 // @description  Keyboard navigation for Hacker News comments: arrows, Enter, Space, Home/End, PageUp/PageDown, and recursive expand/collapse.
 // @author       Jesse McGraw
 // @match        https://news.ycombinator.com/item*
