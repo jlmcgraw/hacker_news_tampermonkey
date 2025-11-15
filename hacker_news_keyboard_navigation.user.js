@@ -34,6 +34,9 @@
   const rows = Array.from(document.querySelectorAll('tr.athing.comtr'));
   if (rows.length === 0) return;
 
+  /**
+   * Determine the nesting depth for a comment row based on the indentation image width.
+   */
   function getIndent(tr) {
     const img = tr.querySelector('td.ind img');
     const w = Number(img?.getAttribute('width') || img?.width || 0);
@@ -58,6 +61,9 @@
 
   const collapsed = new Set();
 
+  /**
+   * Update each cached row's display state and indicator icons based on collapsed set.
+   */
   function recomputeVisibility() {
     const stack = [];
     nodes.forEach((n) => {
@@ -73,6 +79,9 @@
     });
   }
 
+  /**
+   * Walk backwards to find the index of the closest ancestor comment.
+   */
   function findParentIdx(idx) {
     const me = nodes[idx];
     if (!me || me.indent === 0) return -1;
@@ -82,6 +91,9 @@
     return -1;
   }
 
+  /**
+   * Locate the first direct child comment index for a node.
+   */
   function findFirstChildIdx(idx) {
     const base = nodes[idx];
     if (!base) return -1;
@@ -92,16 +104,25 @@
     return -1;
   }
 
+  /**
+   * True when the comment has at least one child node in the linearized tree.
+   */
   function hasChild(idx) {
     return findFirstChildIdx(idx) >= 0;
   }
 
+  /**
+   * Test whether the indexed comment is currently displayed.
+   */
   function isVisibleIdx(idx) {
     const n = nodes[idx];
     return n && n.el.style.display !== 'none';
     // (recomputeVisibility keeps display up to date)
   }
 
+  /**
+   * Detect if a comment row is folded by either our state or HN's native toggle.
+   */
   function isFoldedIdx(idx) {
     const row = nodes[idx]?.el;
     if (!row) return false;
@@ -112,6 +133,9 @@
     return typeof text === 'string' && text.startsWith('[+]');
   }
 
+  /**
+   * Step forward/backward through the list to find the next visible comment.
+   */
   function nextVisibleIdx(idx, dir) {
     let i = idx + dir;
     while (i >= 0 && i < nodes.length) {
@@ -121,16 +145,25 @@
     return -1;
   }
 
+  /**
+   * Return the index of the first visible comment row.
+   */
   function firstVisibleIdx() {
     for (let i = 0; i < nodes.length; i++) if (isVisibleIdx(i)) return i;
     return -1;
   }
 
+  /**
+   * Return the index of the last visible comment row.
+   */
   function lastVisibleIdx() {
     for (let i = nodes.length - 1; i >= 0; i--) if (isVisibleIdx(i)) return i;
     return -1;
   }
 
+  /**
+   * Expand ancestors so the target comment is scrolled into view.
+   */
   function ensureVisibleIdx(idx) {
     let cur = idx;
     while (true) {
@@ -142,11 +175,17 @@
     recomputeVisibility();
   }
 
+  /**
+   * Collapse a single comment node and hide its descendants.
+   */
   function collapseIdx(idx) {
     collapsed.add(idx);
     recomputeVisibility();
   }
 
+  /**
+   * Expand a collapsed comment node if needed.
+   */
   function expandIdx(idx) {
     if (collapsed.has(idx)) {
       collapsed.delete(idx);
@@ -154,10 +193,16 @@
     }
   }
 
+  /**
+   * Check whether a comment index is collapsed in our state set.
+   */
   function isCollapsed(idx) {
     return collapsed.has(idx);
   }
 
+  /**
+   * Find the exclusive end index of the subtree rooted at the given comment.
+   */
   function subtreeEndExclusive(idx) {
     const base = nodes[idx];
     let j = idx + 1;
@@ -165,6 +210,9 @@
     return j; // exclusive
   }
 
+  /**
+   * Collapse all descendants of a comment, marking them in the collapsed set.
+   */
   function collapseSubtree(idx) {
     const end = subtreeEndExclusive(idx);
     // Mark every descendant as collapsed so later expands reveal as collapsed nodes stay closed
@@ -172,17 +220,26 @@
     recomputeVisibility();
   }
 
+  /**
+   * Expand an entire subtree by clearing collapsed state for each node.
+   */
   function expandSubtree(idx) {
     const end = subtreeEndExclusive(idx);
     for (let i = idx; i < end; i++) collapsed.delete(i);
     recomputeVisibility();
   }
 
+  /**
+   * Compute the absolute Y position for a comment row relative to the page.
+   */
   function getRowTopAbs(el) {
     const r = el.getBoundingClientRect();
     return r.top + window.scrollY;
   }
 
+  /**
+   * Jump roughly a page up/down while keeping navigation within visible comments.
+   */
   function pageJump(dir) {
     // dir = +1 (PageDown) or -1 (PageUp)
     const curTop = getRowTopAbs(nodes[activeIdx].el);
@@ -210,6 +267,9 @@
   // ---------- Active handling ----------
   let activeIdx = 0;
 
+  /**
+   * Move the keyboard focus marker to the specified comment row.
+   */
   function setActive(idx, { ensureVisible = true } = {}) {
     if (idx < 0 || idx >= nodes.length) return;
     if (ensureVisible) ensureVisibleIdx(idx);
@@ -226,6 +286,9 @@
   setActive(firstVis >= 0 ? firstVis : 0);
 
   // ---------- Key handling ----------
+  /**
+   * Determine if the event target is an input where keystrokes should be ignored.
+   */
   function isTypingTarget(t) {
     const tag = t?.tagName?.toLowerCase();
     return t?.isContentEditable || tag === 'input' || tag === 'textarea' || tag === 'select';
